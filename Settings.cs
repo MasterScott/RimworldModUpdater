@@ -8,7 +8,7 @@ namespace RimworldModUpdater
 {
     public static class Settings
     {
-        public static string Version = "v1.3.0.2";
+        public static string Version = "1.3.1";
         public static bool ShouldBackupMods = true;
     }
 }

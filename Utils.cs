@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json.Linq;
+using Serilog;
 
 namespace RimworldModUpdater
 {
@@ -85,6 +89,55 @@ namespace RimworldModUpdater
             mods.ForEach(x => totalSize += x?.file_size ?? 0);
 
             return $"{Math.Round(totalSize / 1024d / 1024d, 2)} MB";
+        }
+
+        public static async Task<bool> CheckForUpdates()
+        {
+            if (File.Exists(".ignoreupdates"))
+            {
+                Log.Information(".ignoreupdates file is present; Not checking for updates.");
+                return false;
+            }
+
+            // Does the updater need an update?
+
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("RimworldModUpdater/" + Settings.Version);
+            client.DefaultRequestHeaders.Accept.ParseAdd("text/plain");
+
+            var response = await client.GetAsync("https://gitcdn.xyz/repo/EnervationRIN/RimworldModUpdater/master/ReleaseVersion.txt");
+            var data = await response.Content.ReadAsByteArrayAsync();
+
+            var encoding = SteamWorkshop.GetResponseEncoding(response.Content, Encoding.UTF8);
+
+            string str = encoding.GetString(data).Trim();
+
+            var localVer = Version.Parse(Settings.Version);
+
+            if (Version.TryParse(str, out var ver))
+            {
+                Log.Information($"Remote version is {ver.ToString()}. Local version is {localVer.ToString()}");
+                if (ver > localVer)
+                {
+                    var result = MessageBox.Show($"There is an update available ({localVer.ToString()} => {ver.ToString()}). Do you want to open the release page?\n\nCancel to ignore updates.", "Update Available", MessageBoxButtons.YesNoCancel);
+                    switch (result)
+                    {
+                        case DialogResult.Yes:
+                            Process.Start("https://github.com/EnervationRIN/RimworldModUpdater/releases/latest");
+                            break;
+                        case DialogResult.No:
+
+                            break;
+                        case DialogResult.Cancel:
+                            File.WriteAllText(".ignoreupdates", "");
+                            break;
+                    }
+                }
+            }
+
+            Log.Warning("Couldn't parse remote version while checking for updates. Returned: '{0}'", str);
+            return false;
         }
     }
 }

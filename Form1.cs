@@ -81,6 +81,8 @@ namespace RimworldModUpdater
 
             currentUpdater = new Updater(textGamePath.Text);
             downloadTabManager = new DownloadTabManager(downloaderTabProgressBar, downloaderTabStatus, currentUpdater);
+
+            Utils.CheckForUpdates();
         }
 
         public static void SetStatus(string txt)

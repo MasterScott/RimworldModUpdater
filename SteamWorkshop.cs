@@ -15,7 +15,7 @@ namespace RimworldModUpdater
     {
         public static JObject lastResult;
 
-        private static Encoding GetResponseEncoding(HttpContent content, Encoding fallbackEncoding)
+        public static Encoding GetResponseEncoding(HttpContent content, Encoding fallbackEncoding)
         {
             if (content.Headers.ContentType == null || content.Headers.ContentType.CharSet == null)
                 return fallbackEncoding;
@@ -36,7 +36,7 @@ namespace RimworldModUpdater
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("RimworldModUpdater/1.0");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("RimworldModUpdater/" + Settings.Version);
             client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
 
             var values = new Dictionary<string, string>();
@@ -69,7 +69,7 @@ namespace RimworldModUpdater
 
             var client = new HttpClient();
             client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("RimworldModUpdater/1.0");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("RimworldModUpdater/"+ Settings.Version);
             client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
 
             var values = new Dictionary<string, string>();

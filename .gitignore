@@ -5,6 +5,8 @@
 
 steamcmd/
 MigrationBackup/
+ModUpdater/
+ModUpdater.7z
 
 # User-specific files
 *.rsuser
