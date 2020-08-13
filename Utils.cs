@@ -117,10 +117,10 @@ namespace RimworldModUpdater
 
             if (Version.TryParse(str, out var ver))
             {
-                Log.Information($"Remote version is {ver.ToString()}. Local version is {localVer.ToString()}");
+                Log.Information($"Local version is {localVer.ToString()}. Remote version is {ver.ToString()}.");
                 if (ver > localVer)
                 {
-                    var result = MessageBox.Show($"There is an update available ({localVer.ToString()} => {ver.ToString()}). Do you want to open the release page?\n\nCancel to ignore updates.", "Update Available", MessageBoxButtons.YesNoCancel);
+                    var result = MessageBox.Show($"There is an update available ({localVer.ToString()} => {ver.ToString()}). Do you want to open the download page?\n\nCancel to ignore updates.", "Update Available!", MessageBoxButtons.YesNoCancel);
                     switch (result)
                     {
                         case DialogResult.Yes:

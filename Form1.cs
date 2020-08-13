@@ -29,6 +29,8 @@ namespace RimworldModUpdater
         {
             _instance = this;
 
+            this.Text = "Rimworld Mod Updater " + Settings.Version;
+
             // It's times like this when I really question myself
             new ToolTip().SetToolTip(btnManualUpdate, "Select a mod in your mods folder to update manually.\nWill replace files regardless of whether it's outdated or not.");
             new ToolTip().SetToolTip(btnReset, "Reset the updater to it's inital state, allowing you to query for outdated mods again.");
@@ -454,6 +456,15 @@ namespace RimworldModUpdater
                 if (isCollection)
                 {
                     List<WorkshopFileDetails> files = await SteamWorkshop.GetWorkshopFileDetailsFromCollection(id);
+
+                    if (files == null)
+                    {
+                        MessageBox.Show("Request to get workshop file {0} details failed. See log for details. Try again?", "Uh oh",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        return;
+                    }
+
                     if (MessageBox.Show($"This is a collection. Are you sure you want to download these {files.Count} mods?\nThe total download size is ~{Utils.GetSizeTextForMods(files)}", "Warning", MessageBoxButtons.YesNo) != DialogResult.Yes)
                     {
                         SetDownloadButtonState(true);
@@ -492,6 +503,15 @@ namespace RimworldModUpdater
                 SetDownloadButtonState(true);
 
                 var details = await SteamWorkshop.GetWorkshopFileDetails(id);
+
+                if (details == null)
+                {
+                    MessageBox.Show("Request to get workshop file {0} details failed. See log for details. Try again?", "Uh oh",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    return;
+                }
+
                 if (details.result != 1)
                 {
                     MessageBox.Show("Invalid workshop item; Check log for details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -568,6 +588,11 @@ namespace RimworldModUpdater
                 menu.Items.Add("Open workshop page", null, (o, args) => Process.Start("https://steamcommunity.com/sharedfiles/filedetails/?id=" + mod.ModId));
                 menu.Items.Add("Open changelog page", null, (o, args) => Process.Start("https://steamcommunity.com/sharedfiles/filedetails/changelog/" + mod.ModId));
             }
+        }
+
+        private void useModifiedDates_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.UseModifiedDate = useModifiedDates.Checked;
         }
     }
 }

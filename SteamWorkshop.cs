@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 
@@ -93,7 +94,23 @@ namespace RimworldModUpdater
 
             var encoding = GetResponseEncoding(response.Content, Encoding.UTF8);
 
-            return JObject.Parse(encoding.GetString(data));
+            string str = encoding.GetString(data);
+            JObject obj = null;
+
+            try
+            {
+                obj = JObject.Parse(str);
+            }
+            catch (JsonReaderException ex)
+            {
+                Log.Error("Failed to parse file details JSON. Reason: {0} Result:\n{1}", ex.Message, str);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred while parsing JSON. Result:\n{0}", str);
+            }
+
+            return obj;
         }
 
         public static async Task<bool> IsWorkshopCollection(string fileId)
@@ -101,6 +118,13 @@ namespace RimworldModUpdater
             JObject obj = await GetWorkshopFileDetailsJSON(new []{fileId}, true);
 
             lastResult = obj;
+
+            if (!ResultOK(obj))
+            {
+                string txt = obj != null ? obj.ToString(Formatting.Indented) : "null";
+                Log.Error("Invalid JSON return from steam web api for IsWorkshopCollection. JSON:\n{0}", txt);
+                return false;
+            }
 
             return obj["response"]["resultcount"].ToObject<int>() == 1;
         }
@@ -128,6 +152,13 @@ namespace RimworldModUpdater
 
                 JObject fobj = await GetWorkshopFileDetailsJSON(ids.ToArray());
 
+                if (!ResultOK(fobj))
+                {
+                    string txt = obj != null ? obj.ToString(Formatting.Indented) : "null";
+                    Log.Error("Invalid JSON return from steam web api for GetWorkshopFileDetailsFromCollection. JSON:\n{0}", txt);
+                    return null;
+                }
+
                 return fobj["response"]["publishedfiledetails"].ToObject<List<WorkshopFileDetails>>();
             }
             else
@@ -138,11 +169,25 @@ namespace RimworldModUpdater
             return list;
         }
 
+        private static bool ResultOK(JObject obj)
+        {
+            // equivalent to
+            // obj != null && obj["response"] != null && obj["publishedfiledetails"] != null
+            return obj?["response"]?["publishedfiledetails"] != null;
+        }
+
         public static async Task<List<WorkshopFileDetails>> GetWorkshopFileDetails(BaseMod[] mods)
         {
             JObject obj = await GetWorkshopFileDetailsJSON(mods);
 
             lastResult = obj;
+
+            if (!ResultOK(obj))
+            {
+                string txt = obj != null ? obj.ToString(Formatting.Indented) : "null";
+                Log.Error("Invalid JSON return from steam web api for GetWorkshopFileDetails. JSON:\n{0}", txt);
+                return null;
+            }
 
             return obj["response"]["publishedfiledetails"].ToObject<JArray>().ToObject<List<WorkshopFileDetails>>();
         }
@@ -153,6 +198,13 @@ namespace RimworldModUpdater
 
             lastResult = obj;
 
+            if (!ResultOK(obj))
+            {
+                string txt = obj != null ? obj.ToString(Formatting.Indented) : "null";
+                Log.Error("Invalid JSON return from steam web api for GetWorkshopFileDetails. JSON:\n{0}", txt);
+                return null;
+            }
+
             return obj["response"]["publishedfiledetails"].ToObject<JArray>()[0].ToObject<WorkshopFileDetails>();
         }
 
@@ -161,6 +213,13 @@ namespace RimworldModUpdater
             JObject obj = await GetWorkshopFileDetailsJSON(fileId);
 
             lastResult = obj;
+
+            if (!ResultOK(obj))
+            {
+                string txt = obj != null ? obj.ToString(Formatting.Indented) : "null";
+                Log.Error("Invalid JSON return from steam web api for GetWorkshopFileDetails. JSON:\n{0}", txt);
+                return null;
+            }
 
             return obj["response"]["publishedfiledetails"].ToObject<List<WorkshopFileDetails>>();
         }

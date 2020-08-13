@@ -55,8 +55,22 @@ namespace RimworldModUpdater
                 }
             }
 
+            if (Settings.UseModifiedDate)
+            {
+                var info = new DirectoryInfo(modPath);
+                var ret = Directory.GetLastWriteTime(modPath); 
+                //var dirs = Directory.GetFiles(modPath, "*", SearchOption.AllDirectories);
+
+                info.EnumerateFiles("*.*", SearchOption.AllDirectories).AsParallel().ForAll(x =>
+                {
+                    ret = x.LastWriteTime > ret ? x.LastWriteTime : ret;
+                });
+
+                return DateTimeOffset.FromFileTime(ret.ToFileTime()).UtcDateTime;
+            }
+
             string fileIdPath = Path.Combine(aboutPath, "PublishedFileId.txt");
-            return (DateTimeOffset) DateTimeOffset.FromFileTime(File.GetCreationTime(fileIdPath).ToFileTime()).UtcDateTime;
+            return DateTimeOffset.FromFileTime(File.GetCreationTime(fileIdPath).ToFileTime()).UtcDateTime;
         }
 
         public async Task<string> QueryModId(string modPath)
@@ -83,6 +97,40 @@ namespace RimworldModUpdater
             }
 
             return fileId.Trim();
+        }
+
+        public async Task QueryModBatch(List<BaseMod> batch, int retries = 0)
+        {
+            var detailList = await SteamWorkshop.GetWorkshopFileDetails(batch.ToArray());
+
+            if (detailList == null)
+            {
+                if (retries <= 3)
+                {
+                    Log.Warning("Failed to query batch of {0} mods. Retry {1}...", batch.Count, retries);
+                    retries++;
+                    await QueryModBatch(batch, retries);
+                }
+                else
+                {
+                    Log.Warning("Failed to query batch of {0} mods after {1} retries.", batch.Count, retries);
+                }
+
+                return;
+            }
+            else
+            {
+                if (retries > 0)
+                {
+                    Log.Information("Got batch of {0} mods successfully after {1} retries.", batch.Count, retries);
+                }
+            }
+
+            foreach (var details in detailList)
+            {
+                var mod = batch.FindAll(x => x.ModId == details.publishedfileid);
+                mod.ForEach(x => x.Details = details);
+            }
         }
 
         public async Task QueryFiles()
@@ -140,19 +188,15 @@ namespace RimworldModUpdater
             UpdaterForm.ResetProgress();
             UpdaterForm.SetProgressBounds((int)Math.Ceiling((double)len / batchCount));
 
+            bool retry = false;
             var tasks = new List<Task>();
             for (int i = 0; i < len; i += batchCount)
             {
                 var task = Task.Run(async () =>
                 {
                     var batch = mods.GetRange(i, Math.Min(batchCount, len - i));
-                    var detailList = await SteamWorkshop.GetWorkshopFileDetails(batch.ToArray());
 
-                    foreach (var details in detailList)
-                    {
-                        var mod = batch.FindAll(x => x.ModId == details.publishedfileid);
-                        mod.ForEach(x => x.Details = details);
-                    }
+                    await QueryModBatch(batch);
 
                     num2 += batchCount;
 
@@ -163,7 +207,7 @@ namespace RimworldModUpdater
 
                 tasks.Add(task);
 
-                await Task.Delay(500);
+                await Task.Delay(250);
             }
 
             await Task.WhenAll(tasks);
@@ -185,7 +229,7 @@ namespace RimworldModUpdater
 
                 if (details == null)
                 {
-                    Log.Error($"Couldn't get any details at all for mod {mod.ModId} ({folderName}).");
+                    Log.Error($"Couldn't get any file details for mod {mod.ModId} ({folderName}).");
                     continue;
                 }
 

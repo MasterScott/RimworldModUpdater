@@ -48,6 +48,7 @@
             this.btnManualUpdate = new System.Windows.Forms.Button();
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabUpdater = new System.Windows.Forms.TabPage();
+            this.useModifiedDates = new System.Windows.Forms.CheckBox();
             this.toggleBackupMods = new System.Windows.Forms.CheckBox();
             this.tabDownloader = new System.Windows.Forms.TabPage();
             this.downloaderTabStatus = new System.Windows.Forms.Label();
@@ -251,6 +252,7 @@
             // 
             // tabUpdater
             // 
+            this.tabUpdater.Controls.Add(this.useModifiedDates);
             this.tabUpdater.Controls.Add(this.toggleBackupMods);
             this.tabUpdater.Controls.Add(this.btnQueryFiles);
             this.tabUpdater.Controls.Add(this.listObjectsParsed);
@@ -268,6 +270,19 @@
             this.tabUpdater.TabIndex = 0;
             this.tabUpdater.Text = "Updater";
             this.tabUpdater.UseVisualStyleBackColor = true;
+            // 
+            // useModifiedDates
+            // 
+            this.useModifiedDates.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.useModifiedDates.AutoSize = true;
+            this.useModifiedDates.Location = new System.Drawing.Point(883, 500);
+            this.useModifiedDates.Name = "useModifiedDates";
+            this.useModifiedDates.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.useModifiedDates.Size = new System.Drawing.Size(116, 17);
+            this.useModifiedDates.TabIndex = 11;
+            this.useModifiedDates.Text = "Use modified dates";
+            this.useModifiedDates.UseVisualStyleBackColor = true;
+            this.useModifiedDates.CheckedChanged += new System.EventHandler(this.useModifiedDates_CheckedChanged);
             // 
             // toggleBackupMods
             // 
@@ -519,6 +534,7 @@
         private BrightIdeasSoftware.OLVColumn downloadSize;
         private System.Windows.Forms.ContextMenuStrip downloadedModMenu;
         private BrightIdeasSoftware.OLVColumn modSize;
+        private System.Windows.Forms.CheckBox useModifiedDates;
     }
 }
 

@@ -165,6 +165,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="USAGE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="steamcmd\steamcmd.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
