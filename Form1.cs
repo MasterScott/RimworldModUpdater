@@ -592,7 +592,7 @@ namespace RimworldModUpdater
 
         private void useModifiedDates_CheckedChanged(object sender, EventArgs e)
         {
-            Settings.UseModifiedDate = useModifiedDates.Checked;
+            //Settings.UseModifiedDate = useModifiedDates.Checked;
         }
     }
 }

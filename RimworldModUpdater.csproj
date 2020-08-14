@@ -190,4 +190,12 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>del *.pdb
+del *.XML
+del *.xml
+del log.txt
+del debug.log
+del README.txt</PostBuildEvent>
+  </PropertyGroup>
 </Project>
