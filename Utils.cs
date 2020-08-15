@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -91,6 +92,11 @@ namespace RimworldModUpdater
             return $"{Math.Round(totalSize / 1024d / 1024d, 2)} MB";
         }
 
+        public static Version GetProgramVersion()
+        {
+            return Assembly.GetExecutingAssembly().GetName().Version;
+        }
+
         public static async Task<bool> CheckForUpdates()
         {
             if (File.Exists(".ignoreupdates"))
@@ -113,7 +119,7 @@ namespace RimworldModUpdater
 
             string str = encoding.GetString(data).Trim();
 
-            var localVer = Version.Parse(Settings.Version);
+            var localVer = GetProgramVersion();
 
             if (Version.TryParse(str, out var ver))
             {

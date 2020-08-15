@@ -61,7 +61,22 @@ namespace RimworldModUpdater
 
             var encoding = GetResponseEncoding(response.Content, Encoding.UTF8);
 
-            return JObject.Parse(encoding.GetString(data));
+            string str = encoding.GetString(data);
+            JObject obj = null;
+            try
+            {
+                obj = JObject.Parse(str);
+            }
+            catch (JsonReaderException ex)
+            {
+                Log.Error("Failed to parse file details JSON. Reason: {0} Result:\n{1}", ex.Message, str);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Exception occurred while parsing JSON. Result:\n{0}", str);
+            }
+
+            return obj;
         }
 
         public static async Task<JObject> GetWorkshopFileDetailsJSON(BaseMod[] mods, bool collection = false)

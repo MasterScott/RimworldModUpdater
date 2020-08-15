@@ -69,6 +69,8 @@ namespace RimworldModUpdater
 
             downloader.ModDownloaded += delegate(object sender, BaseMod mod, string folder)
             {
+                // This doesn't work; Download folder still in use by steamcmd by the time this runs because it's when the folder is created.
+                // TODO: More testing 
                 //Log.Information($"User downloaded mod {mod.ModId}; Moving it into Mods folder.");
                 //updater.UpdateMod(mod, Path.Combine(Environment.CurrentDirectory, "steamcmd", "steamapps", "workshop", "content", "294100"), true);
 

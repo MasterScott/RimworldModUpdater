@@ -8,8 +8,8 @@ namespace RimworldModUpdater
 {
     public static class Settings
     {
-        public static string Version = "1.3.2";
         public static bool ShouldBackupMods = true;
         public static bool UseModifiedDate = false;
+        public static string Version = Utils.GetProgramVersion().ToString();
     }
 }

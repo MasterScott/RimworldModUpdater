@@ -29,7 +29,7 @@ namespace RimworldModUpdater
         {
             _instance = this;
 
-            this.Text = "Rimworld Mod Updater " + Settings.Version;
+            this.Text = "Rimworld Mod Updater " + Utils.GetProgramVersion();
 
             // It's times like this when I really question myself
             new ToolTip().SetToolTip(btnManualUpdate, "Select a mod in your mods folder to update manually.\nWill replace files regardless of whether it's outdated or not.");

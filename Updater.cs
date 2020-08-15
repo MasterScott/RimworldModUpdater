@@ -166,10 +166,9 @@ namespace RimworldModUpdater
                         ModPath = folders[i],
                         ModId = id
                     });
-                    
-                }
 
-                count++;
+                    count++;
+                }
 
                 UpdaterForm.UpdateProgress();
             }
@@ -183,6 +182,7 @@ namespace RimworldModUpdater
             int num2 = 0;
             int len = mods.Count;
 
+            UpdaterForm.SetStatus($"Querying {len} mods in {(int)Math.Ceiling((double)len / batchCount)} batches of {batchCount}");
             Log.Information("Querying {0} mods in {1} batches of {2}", len, (int)Math.Ceiling((double)len / batchCount), batchCount);
 
             UpdaterForm.ResetProgress();
