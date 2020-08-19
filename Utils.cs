@@ -107,6 +107,8 @@ namespace RimworldModUpdater
 
             // Does the updater need an update?
 
+            Log.Information("Checking for updates...");
+
             var client = new HttpClient();
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.UserAgent.ParseAdd("RimworldModUpdater/" + Settings.Version);
@@ -126,19 +128,30 @@ namespace RimworldModUpdater
                 Log.Information($"Local version is {localVer.ToString()}. Remote version is {ver.ToString()}.");
                 if (ver > localVer)
                 {
+                    Log.Information("Update available. Creating update popup.");
                     var result = MessageBox.Show($"There is an update available ({localVer.ToString()} => {ver.ToString()}). Do you want to open the download page?\n\nCancel to ignore updates.", "Update Available!", MessageBoxButtons.YesNoCancel);
                     switch (result)
                     {
                         case DialogResult.Yes:
+                            Log.Information("Opening github releases page.");
                             Process.Start("https://github.com/EnervationRIN/RimworldModUpdater/releases/latest");
                             break;
                         case DialogResult.No:
-
+                            Log.Information("User declined update.");
                             break;
                         case DialogResult.Cancel:
+                            Log.Information("Creating .ignoreupdates file");
                             File.WriteAllText(".ignoreupdates", "");
                             break;
                     }
+
+                    return true;
+                }
+                else
+                {
+                    Log.Information("No updates found.");
+
+                    return false;
                 }
             }
 

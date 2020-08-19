@@ -191,6 +191,12 @@ namespace RimworldModUpdater
 
                 if (allRows.Count == 0) return;
 
+                if (MessageBox.Show($"Are you sure you want to update these {allRows.Count} mods?\nThe total download size will be ~{Utils.GetSizeTextForMods(allRows)}", "Warning", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                {
+                    //SetDownloadButtonState(true);
+                    return;
+                }
+
                 Task.Run(() => { currentUpdater.UpdateMods(allRows); });
             }
             else
@@ -219,7 +225,7 @@ namespace RimworldModUpdater
                 {
                     Log.Error(ex, "Failed to query mods.");
                     MessageBox.Show("An exception occurred while querying mods. Check log for details.", "Uh Oh", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    
+
                     _instance.lblStatus.Text = "Waiting...";
                     _instance.btnQueryFiles.Enabled = true;
                     return;
@@ -549,12 +555,12 @@ namespace RimworldModUpdater
             _instance.Invoke((MethodInvoker)(() =>
            {
                if (!e.IsLoading) // Only change address bar when page actually loads; Otherwise you get a little weird behaviour when pasting links and such.
-                {
+               {
                    textViewUrlBar.Text = chromiumWebBrowser.Address;
 
                    if (!textViewUrlBar.Enabled) // Enable URL bar if this is first load.
                    {
-                       ///chromiumWebBrowser.ShowDevTools();
+                       //chromiumWebBrowser.ShowDevTools();
                        textViewUrlBar.Enabled = true;
                    }
 
@@ -593,6 +599,11 @@ namespace RimworldModUpdater
         private void useModifiedDates_CheckedChanged(object sender, EventArgs e)
         {
             //Settings.UseModifiedDate = useModifiedDates.Checked;
+        }
+
+        private void downloaderTabStatus_DoubleClick(object sender, EventArgs e)
+        {
+            chromiumWebBrowser.ShowDevTools();
         }
     }
 }

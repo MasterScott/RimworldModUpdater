@@ -37,13 +37,15 @@ namespace RimworldModUpdater
             try
             {
                 // I'm not 100% sure this causes issues but... pretty sure so that's good enough. We don't need it anyway.
-                File.Delete(Path.Combine(SteamCmdPath, "steamapps", "workshop", "appworkshop_294100.acf")); } catch (Exception ex) { }
+                File.Delete(Path.Combine(SteamCmdPath, "steamapps", "workshop", "appworkshop_294100.acf"));
+            }
+            catch (Exception ex) { }
 
             try
             {
                 string downloadPath = Path.Combine(SteamCmdPath, "steamapps", "workshop", "content", "294100");
 
-                Log.Information("Downloading workshop mods with SteamCMD");
+                Log.Information("Downloading {0} workshop mods with SteamCMD", mods.Count);
 
                 StringBuilder script = new StringBuilder();
 
@@ -99,6 +101,8 @@ namespace RimworldModUpdater
 
                 // Start SteamCMD
                 var steamCMD = new Process { StartInfo = startInfo };
+
+                Log.Information("Starting SteamCMD instance for download of {0} mods", mods.Count);
                 steamCMD.Start();
 
                 // Wait for SteamCMD to start and login.
@@ -127,7 +131,9 @@ namespace RimworldModUpdater
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Error occurred while downloading files with SteamCMD");
+                StringBuilder str = new StringBuilder();
+                mods.ForEach(x => str.AppendLine(x.ModId + " - " + x.Details.title));
+                Log.Error(ex, "Error occurred while downloading {0} mods with SteamCMD. Mods:\n{1}", mods.Count, str);
             }
 
             return false;

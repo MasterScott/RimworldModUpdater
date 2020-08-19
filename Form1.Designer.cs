@@ -137,7 +137,8 @@
             // 
             // downloadSize
             // 
-            this.downloadSize.AspectName = "SizeTag";
+            this.downloadSize.AspectName = "Size";
+            this.downloadSize.AspectToStringFormat = "{0} MB";
             this.downloadSize.Text = "Download Size";
             this.downloadSize.ToolTipText = "The size of the mod on the workshop.";
             this.downloadSize.Width = 97;
@@ -311,6 +312,7 @@
             this.downloaderTabStatus.Size = new System.Drawing.Size(52, 13);
             this.downloaderTabStatus.TabIndex = 12;
             this.downloaderTabStatus.Text = "Waiting...";
+            this.downloaderTabStatus.DoubleClick += new System.EventHandler(this.downloaderTabStatus_DoubleClick);
             // 
             // downloaderTabProgressBar
             // 
@@ -433,7 +435,8 @@
             // 
             // modSize
             // 
-            this.modSize.AspectName = "SizeTag";
+            this.modSize.AspectName = "Size";
+            this.modSize.AspectToStringFormat = "{0} MB";
             this.modSize.Text = "Size";
             this.modSize.ToolTipText = "The size of the downloaded mod.";
             this.modSize.Width = 84;

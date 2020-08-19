@@ -41,6 +41,7 @@ namespace RimworldModUpdater
             string aboutPath = Path.Combine(modPath, "About");
             string lastUpdatedPath = Path.Combine(aboutPath, ".lastupdated");
 
+            // Check for .lastupdated timestamp file
             if (File.Exists(lastUpdatedPath))
             {
                 string str = File.ReadAllText(lastUpdatedPath);
@@ -55,6 +56,7 @@ namespace RimworldModUpdater
                 }
             }
 
+            // Forgot this didn't work because a mod's files will obviously be modified *before* it's uploaded to the workshop, making the comparison useless.
             if (Settings.UseModifiedDate)
             {
                 var info = new DirectoryInfo(modPath);
@@ -78,25 +80,25 @@ namespace RimworldModUpdater
             string aboutPath = Path.Combine(modPath, "About");
             if (!Directory.Exists(aboutPath))
             {
-                Log.Warning($"Tried to query mod folder {Path.GetFileName(modPath)} but couldn't find an About subfolder. Not a mod?");
+                Log.Warning($"Mod folder {Path.GetFileName(modPath)} has no About subfolder. Not a mod?");
                 return null;
             }
 
             string fileIdPath = Path.Combine(aboutPath, "PublishedFileId.txt");
             if (!File.Exists(fileIdPath))
             {
-                Log.Warning($"Tried to query mod folder {Path.GetFileName(modPath)} but couldn't find a PublishedFileId.txt. Not a workshop mod?");
+                Log.Warning($"Mod folder {Path.GetFileName(modPath)} has no PublishedFileId.txt. Not a workshop mod?");
                 return null;
             }
 
-            string fileId = File.ReadAllText(fileIdPath);
+            string fileId = File.ReadAllText(fileIdPath).Trim();
             if (String.IsNullOrWhiteSpace(fileId))
             {
-                Log.Warning($"Tried to query mod folder {Path.GetFileName(modPath)} but PublishedFileId.txt was empty.");
+                Log.Warning($"Mod folder {Path.GetFileName(modPath)} PublishedFileId.txt is empty.");
                 return null;
             }
 
-            return fileId.Trim();
+            return fileId;
         }
 
         public async Task QueryModBatch(List<BaseMod> batch, int retries = 0)
@@ -156,11 +158,11 @@ namespace RimworldModUpdater
             List<BaseMod> mods = new List<BaseMod>();
             for (int i = 0; i < numFolders; i++)
             {
-                Log.Information($"Querying mod folder {folders[i]}");
-
                 string id = await QueryModId(folders[i]);
                 if (!String.IsNullOrWhiteSpace(id))
                 {
+                    Log.Information("Got valid mod folder {0} ({1})", folders[i], id);
+
                     mods.Add(new BaseMod
                     {
                         ModPath = folders[i],
@@ -221,6 +223,7 @@ namespace RimworldModUpdater
             UpdaterForm.SetProgressBounds(mods.Count);
             UpdaterForm.ResetProgress();
 
+            int updateCount = 0;
             foreach (var mod in mods)
             {
                 UpdaterForm.UpdateProgress();
@@ -271,6 +274,7 @@ namespace RimworldModUpdater
                 //Log.Information("{0} < {1}: {2}", remoteDate.ToUnixTimeSeconds(), lastUpdatedDate.ToUnixTimeSeconds(), (remoteDate < lastUpdatedDate));
                 if (remoteDate > lastUpdatedDate)
                 {
+                    updateCount++;
                     Log.Information($"Mod folder {folderName} ({details.publishedfileid}) has an update available.");
 
                     UpdaterForm.AddRow(mod);
@@ -279,12 +283,17 @@ namespace RimworldModUpdater
                 }
             }
 
+            Log.Information("There are {0} mods with updates available.", updateCount);
         }
 
-        public bool UpdateMod(BaseMod obj, string downloadPath, bool forceNoBackup = false)
+        public bool UpdateMod(BaseMod mod, string downloadPath, bool forceNoBackup = false)
         {
-            var details = obj.Details;
+            var details = mod.Details;
             string downloadFolder = Path.Combine(downloadPath, details.publishedfileid);
+
+            string modPath = Path.Combine(ModsPath, mod.Folder);
+            string oldFolder = Path.Combine(modPath, "update_backup");
+            Log.Information($"Moving downloaded mod files for {Path.GetFileName(downloadFolder)} ({mod.ModId}) into mod folder \"{Path.GetFileName(modPath)}\"");
 
             if (!Directory.Exists(downloadFolder))
             {
@@ -300,15 +309,12 @@ namespace RimworldModUpdater
 
             // Throw an error if only About.xml exists in the download folder AND the amount of files in the original mod folder is larger than 1
             // edit: Huh? Why did I do this again?
-            if (Utils.CountShit(downloadFolder) <= 1 && Utils.CountShit(obj.ModPath) > 1)
+            if (Utils.CountShit(downloadFolder) <= 1 && Utils.CountShit(mod.ModPath) > 1)
             {
                 Log.Error($"Couldn't update mod {details.title} ({details.publishedfileid}). No files exist other than About.xml???");
                 return false;
             }
 
-            string modPath = Path.Combine(ModsPath, obj.Folder);
-            string oldFolder = Path.Combine(modPath, "update_backup");
-            Log.Information($"Moving downloaded mod files for {Path.GetFileName(downloadFolder)} into mod folder \"{Path.GetFileName(modPath)}\"");
             if (Settings.ShouldBackupMods && !forceNoBackup)
             {
                 if (!Directory.Exists(oldFolder))

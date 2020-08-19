@@ -21,6 +21,7 @@ namespace RimworldModUpdater
         public DateTimeOffset RemoteUpdatedTime => Details.TimeUpdated;
         public DateTimeOffset RemoteCreatedTime => Details.TimeCreated;
         public string SizeTag => $"{Math.Round((Details?.file_size / 1024d / 1024d) ?? 0, 3)} MB";
+        public double Size => Math.Round((Details?.file_size / 1024d / 1024d) ?? 0, 3);
         public string Title => Details?.title;
 
         public async Task<WorkshopFileDetails> GetWorkshopDetails()

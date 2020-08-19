@@ -42,17 +42,16 @@ namespace RimworldModUpdater
 
             var values = new Dictionary<string, string>();
 
-            values.Add(collection ? "collectioncount" : "itemcount", fileIds.Length.ToString());
-
             var ids = new List<string>();
             for (int i = 0; i < fileIds.Length; i++)
             {
                 string id = fileIds[i];
                 if (ids.Contains(id)) continue; // Don't allow requesting duplicates.
 
-                values.Add($"publishedfileids[{i}]", id);
+                values.Add($"publishedfileids[{ids.Count}]", id);
                 ids.Add(id);
             }
+            values.Add(collection ? "collectioncount" : "itemcount", ids.Count.ToString());
             values.Add("format", "json");
 
             var content = new FormUrlEncodedContent(values);
@@ -90,17 +89,17 @@ namespace RimworldModUpdater
 
             var values = new Dictionary<string, string>();
 
-            values.Add(collection ? "collectioncount" : "itemcount", mods.Length.ToString());
-
             var ids = new List<string>();
             for (int i = 0; i < mods.Length; i++)
             {
                 string id = mods[i].ModId;
                 if (ids.Contains(id)) continue; // Don't allow requesting duplicates.
 
-                values.Add($"publishedfileids[{i}]", id);
+                values.Add($"publishedfileids[{ids.Count}]", id);
                 ids.Add(id);
             }
+
+            values.Add(collection ? "collectioncount" : "itemcount", values.Count.ToString());
             values.Add("format", "json");
 
             var content = new FormUrlEncodedContent(values);

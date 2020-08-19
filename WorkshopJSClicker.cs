@@ -15,13 +15,13 @@ namespace RimworldModUpdater
 
         public void doDownload()
         {
-            Log.Debug("___updater.doDownload()");
+            Log.Debug("_____updater.doDownload()");
             Clicked?.Invoke();
         }
 
         public void doDownloadId(string id)
         {
-            Log.Debug("___updater.doDownloadId()");
+            Log.Debug("_____updater.doDownloadId({0})", id);
             Clicked?.Invoke(id);
         }
     }

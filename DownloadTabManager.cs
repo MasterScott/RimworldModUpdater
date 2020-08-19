@@ -96,13 +96,6 @@ namespace RimworldModUpdater
 
         public async Task<bool> DownloadMod(BaseMod mod)
         {
-            if (!Utils.IsValidGamePath(updater.GamePath))
-            {
-                MessageBox.Show(
-                    "Invalid game path; Select the folder that has your rimworld installation.\nex: C:/Games/Rimworld\n\n The program won't work if the folder you select has no Mods folder.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
             if (downloadingMods.Exists(x => x.ModId == mod.ModId))
             {
                 Log.Information("User tried to download an already downloading mod.");
@@ -146,13 +139,6 @@ namespace RimworldModUpdater
 
         public async Task<bool> DownloadMods(List<BaseMod> mods)
         {
-            if (!Utils.IsValidGamePath(updater.GamePath))
-            {
-                MessageBox.Show(
-                    "Invalid game path; Select the folder that has your rimworld installation.\nex: C:/Games/Rimworld\n\n The program won't work if the folder you select has no Mods folder.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-
             Log.Information($"User started a download for {mods.Count} new mods.");
             downloadingMods.AddRange(mods);
             needsUpdate = true;
