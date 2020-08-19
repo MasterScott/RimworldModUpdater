@@ -81,6 +81,8 @@ namespace RimworldModUpdater
             }
             chromiumWebBrowser.Load("https://steamcommunity.com/app/294100/workshop/");
 
+            chromiumWebBrowser.LifeSpanHandler = new LifeSpanHandler();
+
             currentUpdater = new Updater(textGamePath.Text);
             downloadTabManager = new DownloadTabManager(downloaderTabProgressBar, downloaderTabStatus, currentUpdater);
 
@@ -560,7 +562,7 @@ namespace RimworldModUpdater
 
                    if (!textViewUrlBar.Enabled) // Enable URL bar if this is first load.
                    {
-                       //chromiumWebBrowser.ShowDevTools();
+                       Log.Information("Browser page loaded. Enabling url bar");
                        textViewUrlBar.Enabled = true;
                    }
 
@@ -603,6 +605,7 @@ namespace RimworldModUpdater
 
         private void downloaderTabStatus_DoubleClick(object sender, EventArgs e)
         {
+            Log.Information("Opening browser devtools");
             chromiumWebBrowser.ShowDevTools();
         }
     }
