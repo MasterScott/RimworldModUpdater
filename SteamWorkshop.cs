@@ -133,7 +133,7 @@ namespace RimworldModUpdater
 
             lastResult = obj;
 
-            if (!ResultOK(obj))
+            if (!ResultOK(obj, true))
             {
                 string txt = obj != null ? obj.ToString(Formatting.Indented) : "null";
                 Log.Error("Invalid JSON return from steam web api for IsWorkshopCollection. JSON:\n{0}", txt);
@@ -183,11 +183,11 @@ namespace RimworldModUpdater
             return list;
         }
 
-        private static bool ResultOK(JObject obj)
+        private static bool ResultOK(JObject obj, bool collection = false)
         {
             // equivalent to
             // obj != null && obj["response"] != null && obj["publishedfiledetails"] != null
-            return obj?["response"]?["publishedfiledetails"] != null;
+            return obj?["response"]?[collection ? "collectiondetails" : "publishedfiledetails"] != null;
         }
 
         public static async Task<List<WorkshopFileDetails>> GetWorkshopFileDetails(BaseMod[] mods)

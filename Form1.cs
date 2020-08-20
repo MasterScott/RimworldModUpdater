@@ -467,7 +467,7 @@ namespace RimworldModUpdater
 
                     if (files == null)
                     {
-                        MessageBox.Show("Request to get workshop file {0} details failed. See log for details. Try again?", "Uh oh",
+                        MessageBox.Show($"Request to get workshop file {id} details failed. See log for details. Try again?", "Uh oh",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                         return;
@@ -514,7 +514,7 @@ namespace RimworldModUpdater
 
                 if (details == null)
                 {
-                    MessageBox.Show("Request to get workshop file {0} details failed. See log for details. Try again?", "Uh oh",
+                    MessageBox.Show($"Request to get workshop file {id} details failed. See log for details. Try again?", "Uh oh",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                     return;

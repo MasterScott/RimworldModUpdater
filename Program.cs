@@ -26,10 +26,9 @@ namespace RimworldModUpdater
             Log.Information($"Initializing Cef {Cef.CefSharpVersion} ({Cef.CefVersion}) chromium {Cef.ChromiumVersion}");
 
             Cef.EnableHighDPISupport();
+
             var settings = new CefSettings();
-
             settings.DisableGpuAcceleration();
-
             Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
 
             CefSharpSettings.LegacyJavascriptBindingEnabled = true;
